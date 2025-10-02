@@ -1,20 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../hooks/useAuth';
+import { useEffect } from 'react';
 
-export default function Home() {
+export default function ProtectedRoute({ children }) {
   const { admin, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
-      if (admin) {
-        router.push('/dashboard');
-      } else {
-        router.push('/login');
-      }
+    if (!loading && !admin) {
+      router.push('/login');
     }
   }, [admin, loading, router]);
 
@@ -29,5 +25,10 @@ export default function Home() {
     );
   }
 
-  return null;
+  if (!admin) {
+    return null;
+  }
+
+  return children;
 }
+
