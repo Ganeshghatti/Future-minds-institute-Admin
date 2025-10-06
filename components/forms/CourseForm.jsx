@@ -53,7 +53,14 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
     if (isOpen) {
       fetchCategories();
       if (course) {
-        reset(course);
+        const courseForForm = {
+          ...course,
+          features: Array.isArray(course.features) ? course.features.join(', ') : course.features || '',
+          categories: Array.isArray(course.categories) ? course.categories.map(cat => 
+            typeof cat === 'object' ? cat._id : cat
+          ) : []
+        };
+        reset(courseForForm);
       } else {
         reset({
           name: '',
@@ -86,11 +93,9 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      // Convert features string to array for backend
       const courseData = {
         ...data,
         features: data.features.split(',').map(f => f.trim()).filter(f => f.length > 0),
-        // Ensure categories is always an array
         categories: Array.isArray(data.categories) ? data.categories : []
       };
       
@@ -112,7 +117,7 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={course ? 'Edit Course' : 'Create New Course'} size="lg">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
         <div>
           <Input
             label="Course Name"
@@ -128,8 +133,8 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
             Description <span className="text-red-500">*</span>
           </label>
           <textarea
-            rows={4}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white placeholder-gray-400"
+            rows={3}
+            className="block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white placeholder-gray-400 resize-none"
             placeholder="Enter course description"
             {...register('description')}
           />
@@ -138,7 +143,7 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <Input
               label="Duration Title"
@@ -162,7 +167,7 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <Input
               label="Price (₹)"
@@ -206,7 +211,7 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
           </label>
           <textarea
             rows={3}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white placeholder-gray-400"
+            className="block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white placeholder-gray-400 resize-none"
             placeholder="Enter features separated by commas (e.g., Feature 1, Feature 2, Feature 3)"
             {...register('features')}
           />
@@ -220,15 +225,14 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
             Categories
           </label>
           
-          <div className="border border-gray-300 rounded-md p-3 max-h-32 overflow-y-auto">
-            
+          <div className="border border-gray-300 rounded-md p-3 max-h-32 sm:max-h-40 overflow-y-auto bg-gray-50">
             {categories.length > 0 ? (
               <div className="space-y-2">
                 {categories.map((category) => (
-                  <label key={category._id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                  <label key={category._id} className="flex items-start space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded transition-colors">
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
                       onChange={(e) => {
                         const currentValues = watch('categories') || [];
                         if (e.target.checked) {
@@ -239,13 +243,15 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
                       }}
                       checked={watch('categories')?.includes(category._id) || false}
                     />
-                    <span className="text-sm text-gray-900">{category.name}</span>
-                    <span className="text-xs text-gray-500">({category.description})</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-medium text-gray-900 block">{category.name}</span>
+                      <span className="text-xs text-gray-500 block mt-0.5">{category.description}</span>
+                    </div>
                   </label>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-600">No categories available. Create categories first.</p>
+              <p className="text-sm text-gray-600 text-center py-2">No categories available. Create categories first.</p>
             )}
           </div>
           {errors.categories && (
@@ -253,30 +259,23 @@ const CourseForm = ({ isOpen, onClose, course = null, onSuccess }) => {
           )}
         </div>
 
-        <div>
-          <label className="flex items-center">
+        <div className="flex items-center justify-center sm:justify-start">
+          <label className="flex items-center space-x-2 cursor-pointer">
             <input
               type="checkbox"
-              className="mr-2"
+              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
               {...register('isActive')}
             />
             <span className="text-sm font-medium text-gray-700">Active Course</span>
           </label>
         </div>
 
-        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg sticky -bottom-5">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-            disabled={loading}
-          >
-            Cancel
-          </Button>
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 sm:pt-6 border-t border-gray-200 bg-gray-50 -mx-6 px-4 sm:px-6 py-5 rounded-b-lg sticky bottom-0">
           <Button
             type="submit"
             loading={loading}
             disabled={loading}
+            className="w-full sm:w-auto order-1 sm:order-2"
           >
             {course ? 'Update Course' : 'Create Course'}
           </Button>

@@ -67,6 +67,7 @@ const CategoryForm = ({ isOpen, onClose, category = null, onSuccess }) => {
           <Input
             label="Category Name"
             placeholder="Enter category name"
+            className="text-sm text-gray-900 placeholder-gray-400"
             error={errors.name?.message}
             required
             {...register('name')}
@@ -74,12 +75,12 @@ const CategoryForm = ({ isOpen, onClose, category = null, onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-900 mb-1">
             Description <span className="text-red-500">*</span>
           </label>
           <textarea
             rows={3}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full px-3 py-2 border text-sm text-gray-900 placeholder-gray-400 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter category description"
             {...register('description')}
           />
@@ -89,14 +90,7 @@ const CategoryForm = ({ isOpen, onClose, category = null, onSuccess }) => {
         </div>
 
 
-        <div className="flex justify-end space-x-3">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
+        <div className="flex justify-end space-x-3 py-4">
           <Button
             type="submit"
             loading={loading}

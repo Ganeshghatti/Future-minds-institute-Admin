@@ -113,7 +113,7 @@ export default function CoursesPage() {
                       <div className="flex flex-wrap gap-1">
                         {course.categories.slice(0, 2).map((category, index) => (
                           <span key={index} className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-                            {typeof category === 'object' ? category.name : 'Category'}
+                            {typeof category === 'object' ? category.name : "Category"}
                           </span>
                         ))}
                         {course.categories.length > 2 && (
