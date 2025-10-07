@@ -5,6 +5,21 @@ import apiClient from '../lib/api';
 
 const AuthContext = createContext();
 
+const isTokenValid = (token) => {
+  try {
+  if (!token) return false;
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  const currentTime = Date.now() / 1000;
+  if (payload.exp && payload.exp < currentTime) {
+    return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Error validating token:", error);
+    return false;
+  }
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -22,14 +37,21 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      try {
-        // Verify token with backend
-        setAdmin({ token });
-      } catch (error) {
-        localStorage.removeItem('adminToken');
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('adminToken');
+      if (!token || !isTokenValid(token)) {
+        localStorage.removeItem("token"); // Remove invalid token
+        setLoading(false);
+        return;
       }
+      else {
+        setAdmin({ token });
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      localStorage.removeItem('adminToken');
+      setAdmin(null);
     }
     setLoading(false);
   };
